@@ -3,10 +3,16 @@ import {
   collection,
   runTransaction,
   Timestamp,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { calculateStreak } from '../utils/streak';
 import { validateEntryInput } from '../utils/validation';
+import { startOfMonth, endOfMonth } from 'date-fns';
 
 /**
  * Saves a diary entry using a Firestore transaction for atomicity.
@@ -89,4 +95,71 @@ export async function saveEntry(userId, input, existingEntryId) {
   });
 
   return entryId;
+}
+
+/**
+ * Retrieves diary entry summaries for a given month.
+ * Queries Firestore for entries belonging to the user within the specified month,
+ * sorted by date ascending.
+ *
+ * @param {string} userId - The authenticated user's UID
+ * @param {number} year - The 4-digit year
+ * @param {number} month - The month (0-indexed, JavaScript Date convention)
+ * @returns {Promise<Array<{entryId: string, date: Date, title: string, mood: string}>>}
+ */
+export async function getEntriesForMonth(userId, year, month) {
+  const monthStart = startOfMonth(new Date(year, month));
+  const monthEnd = endOfMonth(new Date(year, month));
+
+  const startTimestamp = Timestamp.fromDate(monthStart);
+  const endTimestamp = Timestamp.fromDate(monthEnd);
+
+  const entriesRef = collection(db, 'entries');
+  const q = query(
+    entriesRef,
+    where('userId', '==', userId),
+    where('date', '>=', startTimestamp),
+    where('date', '<=', endTimestamp),
+    orderBy('date', 'asc')
+  );
+
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map((docSnap) => {
+    const data = docSnap.data();
+    return {
+      entryId: docSnap.id,
+      date: data.date.toDate(),
+      title: data.title,
+      mood: data.mood,
+    };
+  });
+}
+
+/**
+ * Retrieves a single diary entry by ID, verifying ownership.
+ * Throws an error if the entry does not exist or does not belong to the user.
+ *
+ * @param {string} entryId - The Firestore document ID of the entry
+ * @param {string} userId - The authenticated user's UID
+ * @returns {Promise<object>} The full entry data including entryId
+ */
+export async function getEntry(entryId, userId) {
+  const entryRef = doc(db, 'entries', entryId);
+  const entrySnap = await getDoc(entryRef);
+
+  if (!entrySnap.exists()) {
+    throw new Error('Entry not found');
+  }
+
+  const data = entrySnap.data();
+
+  if (data.userId !== userId) {
+    throw new Error('Permission denied');
+  }
+
+  return {
+    entryId: entrySnap.id,
+    ...data,
+  };
 }

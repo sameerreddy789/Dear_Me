@@ -64,7 +64,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
 - [x] 3. Checkpoint — Auth and routing
   - Ensure all tests pass, ask the user if questions arise.
 
-- [-] 4. Core diary entry services and validation
+- [x] 4. Core diary entry services and validation
   - [x] 4.1 Implement entry validation utilities
     - Create `src/utils/validation.ts` with functions: `validateTitle(title)`, `validateMood(mood)`, `validateImages(images)`, `validateEntryDate(date)`, `validateEntryInput(input)`
     - Title: 1–200 characters, non-empty after trim
@@ -101,7 +101,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Validate input before saving using validation utilities
     - _Requirements: 4.3, 4.4, 4.5, 7.1, 7.2, 7.3, 7.4, 7.6, 11.6_
 
-  - [-] 4.6 Implement getEntriesForMonth and getEntry services
+  - [x] 4.6 Implement getEntriesForMonth and getEntry services
     - Add `getEntriesForMonth(userId, year, month)` to `src/services/entries.ts`
     - Query Firestore with `where('userId', '==', userId)` and date range filters
     - Sort results by date ascending
@@ -112,7 +112,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 1: Entry Ownership Isolation** — `getEntry(entryId, userId)` returns data only if `entry.userId === userId`
     - **Validates: Requirements 12.1, 12.2**
 
-- [ ] 5. Checkpoint — Core services and validation
+- [x] 5. Checkpoint — Core services and validation
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 6. Dashboard page
