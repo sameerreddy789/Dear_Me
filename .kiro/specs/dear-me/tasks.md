@@ -115,7 +115,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
 - [x] 5. Checkpoint — Core services and validation
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Dashboard page
+- [-] 6. Dashboard page
   - [ ] 6.1 Implement Dashboard page with greeting, streak, quote, and recent entries
     - Create `src/pages/DashboardPage.tsx`
     - Display time-of-day greeting (morning/afternoon/evening) with user's name
@@ -125,7 +125,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Add "New Entry" button linking to `/editor`
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 6.2 Implement quotes data and getRandomQuote utility
+  - [x] 6.2 Implement quotes data and getRandomQuote utility
     - Create `src/data/quotes.json` with at least 20 motivational quotes with text, author, and category
     - Create `src/utils/quotes.ts` implementing `getRandomQuote(quotes, previousQuoteId?)`
     - Ensure non-repetition when quotes.length > 1
@@ -136,7 +136,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 8: Quote Non-Repetition** — For any quotes array with length > 1 and any previousQuoteId, `getRandomQuote(quotes, previousQuoteId).id !== previousQuoteId`
     - **Validates: Requirements 10.2**
 
-  - [ ] 6.4 Implement mood selector component
+  - [-] 6.4 Implement mood selector component
     - Create `src/components/MoodSelector.tsx` displaying the 7 mood options with emoji icons
     - Allow single mood selection with visual highlight
     - _Requirements: 3.5, 11.3_
