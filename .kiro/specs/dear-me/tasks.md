@@ -61,11 +61,11 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Test error message display on auth failure
     - _Requirements: 1.1, 1.6_
 
-- [ ] 3. Checkpoint — Auth and routing
+- [x] 3. Checkpoint — Auth and routing
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Core diary entry services and validation
-  - [ ] 4.1 Implement entry validation utilities
+- [-] 4. Core diary entry services and validation
+  - [x] 4.1 Implement entry validation utilities
     - Create `src/utils/validation.ts` with functions: `validateTitle(title)`, `validateMood(mood)`, `validateImages(images)`, `validateEntryDate(date)`, `validateEntryInput(input)`
     - Title: 1–200 characters, non-empty after trim
     - Mood: must be one of the 7 valid Mood values
@@ -78,7 +78,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - For any Date d where d > now(), `validateEntryDate(d)` returns invalid. For any Date d where d ≤ now(), `validateEntryDate(d)` returns valid.
     - **Validates: Requirements 11.5, 4.7**
 
-  - [ ] 4.3 Implement calculateStreak utility
+  - [-] 4.3 Implement calculateStreak utility
     - Create `src/utils/streak.ts` implementing `calculateStreak(lastEntryDate, currentDate, currentStreak)`
     - Handle all four cases: null (first entry), same day, consecutive day, streak broken
     - Return `{ newStreak }` as a pure function
