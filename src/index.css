@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #FFB6C1;
+  --color-background: #F7FAFC;
+  --color-surface: #FFFFFF;
+  --color-text: #2D3748;
+  --color-accent: #A0AEC0;
+  --paper-texture: none;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
