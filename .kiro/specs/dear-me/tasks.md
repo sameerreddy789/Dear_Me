@@ -93,7 +93,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Test consecutive: `calculateStreak(yesterday, today, n).newStreak === n + 1`
     - Test broken: `calculateStreak(twoDaysAgo, today, n).newStreak === 1`
 
-  - [ ] 4.5 Implement saveEntry service with Firestore transaction
+  - [x] 4.5 Implement saveEntry service with Firestore transaction
     - Create `src/services/entries.ts` with `saveEntry(userId, input, existingEntryId?)` function
     - Use `runTransaction` for atomic entry write + streak update
     - Set `createdAt` on new entries, always set `updatedAt`
@@ -101,7 +101,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Validate input before saving using validation utilities
     - _Requirements: 4.3, 4.4, 4.5, 7.1, 7.2, 7.3, 7.4, 7.6, 11.6_
 
-  - [ ] 4.6 Implement getEntriesForMonth and getEntry services
+  - [-] 4.6 Implement getEntriesForMonth and getEntry services
     - Add `getEntriesForMonth(userId, year, month)` to `src/services/entries.ts`
     - Query Firestore with `where('userId', '==', userId)` and date range filters
     - Sort results by date ascending
