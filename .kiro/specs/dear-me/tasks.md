@@ -43,14 +43,14 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - On first sign-in, create Firestore user document at `users/{uid}` with name, email, streak: 0, longestStreak: 0, createdAt
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7_
 
-  - [ ] 2.2 Implement LoginPage with Google and email/password sign-in
+  - [x] 2.2 Implement LoginPage with Google and email/password sign-in
     - Create `src/pages/LoginPage.tsx` with Google sign-in button and email/password form
     - Display error messages on auth failure
     - Redirect to Dashboard on successful sign-in
     - Style with Tailwind using pastel theme and Pacifico heading font
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
 
-  - [ ] 2.3 Implement ProtectedRoute component
+  - [-] 2.3 Implement ProtectedRoute component
     - Create `src/components/ProtectedRoute.tsx` that redirects unauthenticated users to `/login`
     - Wrap Dashboard, Editor, and Calendar routes with ProtectedRoute
     - Show loading spinner while auth state is resolving
