@@ -33,7 +33,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Create placeholder page components: `LoginPage`, `DashboardPage`, `EditorPage`, `CalendarPage`
     - _Requirements: 1.1, 1.2_
 
-- [-] 2. Authentication module
+- [x] 2. Authentication module
   - [x] 2.1 Implement AuthContext and AuthProvider
     - Create `src/contexts/AuthContext.tsx` implementing `AuthContextType` interface
     - Use `onAuthStateChanged` to listen for auth state changes
@@ -50,7 +50,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Style with Tailwind using pastel theme and Pacifico heading font
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
 
-  - [-] 2.3 Implement ProtectedRoute component
+  - [x] 2.3 Implement ProtectedRoute component
     - Create `src/components/ProtectedRoute.tsx` that redirects unauthenticated users to `/login`
     - Wrap Dashboard, Editor, and Calendar routes with ProtectedRoute
     - Show loading spinner while auth state is resolving
