@@ -78,7 +78,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - For any Date d where d > now(), `validateEntryDate(d)` returns invalid. For any Date d where d ≤ now(), `validateEntryDate(d)` returns valid.
     - **Validates: Requirements 11.5, 4.7**
 
-  - [-] 4.3 Implement calculateStreak utility
+  - [x] 4.3 Implement calculateStreak utility
     - Create `src/utils/streak.ts` implementing `calculateStreak(lastEntryDate, currentDate, currentStreak)`
     - Handle all four cases: null (first entry), same day, consecutive day, streak broken
     - Return `{ newStreak }` as a pure function
