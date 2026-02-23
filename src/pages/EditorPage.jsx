@@ -10,10 +10,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { saveEntry, getEntry } from '../services/entries'
 import { validateTitle, validateEntryDate } from '../utils/validation'
-import { uploadImage } from '../services/storage'
+import { uploadImage, uploadDrawing } from '../services/storage'
 import { MAX_IMAGES, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '../constants'
 import MoodSelector from '../components/MoodSelector'
 import EditorToolbar from '../components/EditorToolbar'
+import DrawingCanvas from '../components/DrawingCanvas'
 
 const DRAFT_KEY = 'dearme-draft'
 const AUTO_SAVE_INTERVAL = 30000 // 30 seconds
@@ -67,6 +68,9 @@ function EditorPage() {
   const [existingEntryId, setExistingEntryId] = useState(entryId || null)
   const [imageError, setImageError] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [showDrawingCanvas, setShowDrawingCanvas] = useState(false)
+  const [drawingError, setDrawingError] = useState(null)
+  const [uploadingDrawing, setUploadingDrawing] = useState(false)
 
   // Generate a stable temp ID for new entries so images can be uploaded before save
   const tempEntryIdRef = useRef(
@@ -228,6 +232,33 @@ function EditorPage() {
   // Remove an uploaded image by index
   const handleRemoveImage = useCallback((index) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
+  }, [])
+
+  // Drawing canvas save handler
+  const handleDrawingSave = useCallback(async (dataURL) => {
+    if (!user) return
+
+    setDrawingError(null)
+    setUploadingDrawing(true)
+
+    try {
+      const uploadEntryId = existingEntryId || tempEntryIdRef.current
+      const url = await uploadDrawing(user.uid, uploadEntryId, dataURL)
+      setDrawingURL(url)
+      setShowDrawingCanvas(false)
+    } catch (err) {
+      setDrawingError(err.message || 'Could not save your drawing. Please try simplifying it.')
+    } finally {
+      setUploadingDrawing(false)
+    }
+  }, [user, existingEntryId])
+
+  const handleDrawingClose = useCallback(() => {
+    setShowDrawingCanvas(false)
+  }, [])
+
+  const handleRemoveDrawing = useCallback(() => {
+    setDrawingURL(null)
   }, [])
 
   // Task 7.2 — Save entry handler
@@ -427,12 +458,26 @@ function EditorPage() {
           >
             {uploading ? 'Uploading...' : '📷 Add Image'}
           </button>
+          <button
+            type="button"
+            onClick={() => setShowDrawingCanvas(true)}
+            className="px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors cursor-pointer"
+          >
+            🎨 Open Drawing
+          </button>
         </div>
 
         {/* Image error */}
         {imageError && (
           <p className="font-['Poppins'] text-sm text-red-500 mb-2" role="alert">
             {imageError}
+          </p>
+        )}
+
+        {/* Drawing error toast */}
+        {drawingError && (
+          <p className="font-['Poppins'] text-sm text-red-500 mb-2" role="alert">
+            {drawingError}
           </p>
         )}
 
@@ -458,7 +503,65 @@ function EditorPage() {
             ))}
           </div>
         )}
+
+        {/* Drawing preview thumbnail */}
+        {drawingURL && (
+          <div className="mt-3">
+            <p className="font-['Poppins'] text-sm text-gray-600 mb-1">Drawing</p>
+            <div className="relative group w-32 h-24 rounded-xl overflow-hidden border border-purple-200 shadow-sm bg-white">
+              <img
+                src={drawingURL}
+                alt="Saved drawing"
+                className="w-full h-full object-contain"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveDrawing}
+                className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                aria-label="Remove drawing"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Drawing Canvas Modal */}
+      <AnimatePresence>
+        {showDrawingCanvas && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl max-w-[650px] w-full max-h-[90vh] overflow-auto"
+            >
+              <h2 className="font-['Caveat'] text-2xl text-purple-600 mb-3 text-center">
+                🎨 Draw Something
+              </h2>
+              {uploadingDrawing && (
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-4 h-4 border-2 border-purple-200 border-t-purple-500 rounded-full animate-spin" />
+                  <span className="font-['Poppins'] text-sm text-gray-500">Saving drawing...</span>
+                </div>
+              )}
+              <DrawingCanvas
+                width={560}
+                height={400}
+                onSave={handleDrawingSave}
+                onClose={handleDrawingClose}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Save button */}
       <div className="flex justify-end">

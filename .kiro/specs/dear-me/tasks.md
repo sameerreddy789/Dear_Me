@@ -56,7 +56,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Show loading spinner while auth state is resolving
     - _Requirements: 1.1, 12.1, 12.2_
 
-  - [ ]* 2.4 Write unit tests for AuthProvider
+  - [ ] 2.4 Write unit tests for AuthProvider
     - Test that unauthenticated state shows login page
     - Test error message display on auth failure
     - _Requirements: 1.1, 1.6_
@@ -193,15 +193,15 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 4: Image Upload Integrity** — For any file with size > 5MB, upload is rejected. For any file with MIME type not in {jpeg, png, gif, webp}, upload is rejected.
     - **Validates: Requirements 5.3, 5.4**
 
-- [ ] 10. Drawing canvas
-  - [ ] 10.1 Implement DrawingCanvas component with Fabric.js
+- [x] 10. Drawing canvas
+  - [x] 10.1 Implement DrawingCanvas component with Fabric.js
     - Create `src/components/DrawingCanvas.tsx` with Fabric.js canvas initialization
     - Implement pencil tool, eraser tool, color picker, and brush size slider
     - Export canvas as PNG data URL on save
     - Provide close button to dismiss canvas without saving
     - _Requirements: 6.1, 6.2, 6.4_
 
-  - [ ] 10.2 Integrate DrawingCanvas into DiaryEditor
+  - [x] 10.2 Integrate DrawingCanvas into DiaryEditor
     - Add "Open Drawing" button in EditorPage
     - Show DrawingCanvas as a modal overlay
     - On canvas save, upload PNG to Firebase Storage at `drawings/{userId}/{entryId}.png`
