@@ -173,15 +173,15 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
 - [x] 8. Checkpoint — Editor and dashboard functional
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Image upload
-  - [ ] 9.1 Implement image upload service
+- [x] 9. Image upload
+  - [x] 9.1 Implement image upload service
     - Create `src/services/storage.ts` with `uploadImage(userId, entryId, file)` function
     - Validate file size (≤ 5MB) and MIME type (jpeg, png, gif, webp) before upload
     - Upload to Firebase Storage at `images/{userId}/{entryId}/{filename}`
     - Return download URL on success
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-  - [ ] 9.2 Integrate image upload into DiaryEditor
+  - [x] 9.2 Integrate image upload into DiaryEditor
     - Add image upload button to EditorToolbar
     - Display uploaded images as thumbnails below the editor
     - Enforce max 10 images per entry

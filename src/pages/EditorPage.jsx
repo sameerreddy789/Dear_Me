@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { saveEntry, getEntry } from '../services/entries'
 import { validateTitle, validateEntryDate } from '../utils/validation'
+import { uploadImage } from '../services/storage'
+import { MAX_IMAGES, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '../constants'
 import MoodSelector from '../components/MoodSelector'
 import EditorToolbar from '../components/EditorToolbar'
 
@@ -63,6 +65,16 @@ function EditorPage() {
   const [loading, setLoading] = useState(!!entryId)
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
   const [existingEntryId, setExistingEntryId] = useState(entryId || null)
+  const [imageError, setImageError] = useState(null)
+  const [uploading, setUploading] = useState(false)
+
+  // Generate a stable temp ID for new entries so images can be uploaded before save
+  const tempEntryIdRef = useRef(
+    entryId || (typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : String(Date.now()))
+  )
+  const fileInputRef = useRef(null)
 
   const autoSaveTimerRef = useRef(null)
   const editorReadyRef = useRef(false)
@@ -175,6 +187,48 @@ function EditorPage() {
       }
     }
   }, [entryId, title, mood, editor])
+
+  // Image upload handler
+  const handleImageUpload = useCallback(async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Reset file input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = ''
+
+    setImageError(null)
+
+    if (images.length >= MAX_IMAGES) {
+      setImageError(`Maximum ${MAX_IMAGES} images per entry`)
+      return
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setImageError('Image must be under 5MB')
+      return
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setImageError('Please upload a JPEG, PNG, GIF, or WebP image')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const uploadEntryId = existingEntryId || tempEntryIdRef.current
+      const url = await uploadImage(user.uid, uploadEntryId, file)
+      setImages((prev) => [...prev, url])
+    } catch (err) {
+      setImageError(err.message || 'Failed to upload image. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }, [images, existingEntryId, user])
+
+  // Remove an uploaded image by index
+  const handleRemoveImage = useCallback((index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }, [])
 
   // Task 7.2 — Save entry handler
   const handleSave = useCallback(async () => {
@@ -344,6 +398,66 @@ function EditorPage() {
         }}
       >
         <EditorContent editor={editor} />
+      </div>
+
+      {/* Image upload section */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-2">
+          <label className="font-['Poppins'] text-sm text-gray-600">
+            Images ({images.length}/{MAX_IMAGES})
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            onChange={handleImageUpload}
+            className="hidden"
+            id="image-upload"
+            aria-label="Upload image"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading || images.length >= MAX_IMAGES}
+            className={`px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium transition-colors ${
+              uploading || images.length >= MAX_IMAGES
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-pink-100 text-pink-600 hover:bg-pink-200 cursor-pointer'
+            }`}
+          >
+            {uploading ? 'Uploading...' : '📷 Add Image'}
+          </button>
+        </div>
+
+        {/* Image error */}
+        {imageError && (
+          <p className="font-['Poppins'] text-sm text-red-500 mb-2" role="alert">
+            {imageError}
+          </p>
+        )}
+
+        {/* Image thumbnails */}
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-3">
+            {images.map((url, index) => (
+              <div key={url} className="relative group w-24 h-24 rounded-xl overflow-hidden border border-pink-100 shadow-sm">
+                <img
+                  src={url}
+                  alt={`Upload ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  aria-label={`Remove image ${index + 1}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Save button */}
