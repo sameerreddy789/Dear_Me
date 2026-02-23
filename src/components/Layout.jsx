@@ -1,4 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import AnimatedOutlet from './AnimatedOutlet'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
@@ -28,25 +30,36 @@ function Layout() {
                 }`
               }
             >
-              <span className="text-lg">{icon}</span>
-              {label}
+              {({ isActive }) => (
+                <motion.span
+                  className="flex items-center gap-3 w-full"
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                >
+                  <span className="text-lg">{icon}</span>
+                  {label}
+                </motion.span>
+              )}
             </NavLink>
           ))}
         </nav>
 
         <div className="p-3 border-t border-pink-100">
-          <button
+          <motion.button
+            whileHover={{ x: 4 }}
+            whileTap={{ scale: 0.97 }}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-['Poppins'] text-sm text-[var(--color-text)] hover:bg-red-50 hover:text-red-400 transition-colors cursor-pointer"
           >
             <span className="text-lg">👋</span>
             Sign Out
-          </button>
+          </motion.button>
         </div>
       </aside>
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
-        <Outlet />
+        <AnimatedOutlet />
       </main>
     </div>
   )

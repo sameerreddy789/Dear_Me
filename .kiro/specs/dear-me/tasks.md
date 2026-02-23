@@ -56,7 +56,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Show loading spinner while auth state is resolving
     - _Requirements: 1.1, 12.1, 12.2_
 
-  - [ ] 2.4 Write unit tests for AuthProvider
+  - [x] 2.4 Write unit tests for AuthProvider
     - Test that unauthenticated state shows login page
     - Test error message display on auth failure
     - _Requirements: 1.1, 1.6_
@@ -108,7 +108,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Add `getEntry(entryId, userId)` that verifies ownership before returning
     - _Requirements: 8.1, 8.5, 8.6, 12.1, 12.2_
 
-  - [ ]* 4.7 Write property test for entry ownership isolation
+  - [x] 4.7 Write property test for entry ownership isolation
     - **Property 1: Entry Ownership Isolation** — `getEntry(entryId, userId)` returns data only if `entry.userId === userId`
     - **Validates: Requirements 12.1, 12.2**
 
@@ -238,20 +238,20 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
 - [x] 12. Checkpoint — Full feature set functional
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 13. Theme system
-  - [ ] 13.1 Implement ThemeProvider context and theme application
+- [x] 13. Theme system
+  - [x] 13.1 Implement ThemeProvider context and theme application
     - Create `src/contexts/ThemeContext.tsx` with `ThemeProvider` component
     - Define all 5 themes (pastel-pink, midnight-blue, soft-yellow, mint-green, cloud-white) with their color values
     - Implement `applyTheme(themeName, darkMode)` setting CSS custom properties on `:root`
     - Support dark mode toggle adjusting background, surface, and text colors
     - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-  - [ ] 13.2 Persist theme preference and apply on load
+  - [x] 13.2 Persist theme preference and apply on load
     - Save selected theme and dark mode to Firestore user document on change
     - On app load, read user's theme preference and apply it
     - _Requirements: 9.5, 9.6_
 
-  - [ ] 13.3 Create theme picker UI component
+  - [x] 13.3 Create theme picker UI component
     - Create `src/components/ThemePicker.tsx` showing 5 theme swatches and a dark mode toggle
     - Integrate into Dashboard or a settings panel
     - _Requirements: 9.1, 9.2, 9.3_
@@ -260,8 +260,8 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 7: Theme Application Completeness** — For every `themeName` in ThemeName and both `darkMode` values, `applyTheme` sets all required CSS custom properties (primary, background, surface, text, accent, paper-texture)
     - **Validates: Requirements 9.4**
 
-- [ ] 14. PIN lock feature
-  - [ ] 14.1 Implement PIN set and verify functionality
+- [x] 14. PIN lock feature
+  - [x] 14.1 Implement PIN set and verify functionality
     - Add `setPin(pin)` and `verifyPin(pin)` to AuthContext
     - Hash PIN client-side before storing in Firestore
     - Create `src/components/PinLockScreen.tsx` with numeric PIN input
@@ -269,15 +269,15 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Display error on incorrect PIN, grant access on correct PIN
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 15. Animations and polish
-  - [ ] 15.1 Add Framer Motion page transitions and micro-animations
+- [x] 15. Animations and polish
+  - [x] 15.1 Add Framer Motion page transitions and micro-animations
     - Add `AnimatePresence` and page transition animations to route changes
     - Add floating/breathing animations to dashboard elements
     - Add entry save success animation (confetti or sparkle effect)
     - Add hover and tap animations to buttons and cards
     - _Requirements: 4.9, 8.3_
 
-  - [ ] 15.2 Implement offline resilience and error handling
+  - [x] 15.2 Implement offline resilience and error handling
     - Enable Firestore offline persistence
     - On save failure, store entry in localStorage and show "Saved locally" banner
     - On reconnection, detect draft and prompt user to sync
@@ -285,8 +285,8 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Add friendly maintenance page for quota exceeded scenarios
     - _Requirements: 13.1, 13.2, 13.3, 13.4_
 
-- [ ] 16. Entry ownership enforcement
-  - [ ] 16.1 Create Firestore security rules file
+- [x] 16. Entry ownership enforcement
+  - [x] 16.1 Create Firestore security rules file
     - Create `firestore.rules` enforcing `request.auth.uid == resource.data.userId` on all entry reads and writes
     - Enforce user document access restricted to own UID
     - Enforce Storage rules for user-scoped paths
@@ -296,7 +296,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 9: PIN Security** — For any user with a PIN set, `verifyPin(correctPin)` returns true and `verifyPin(wrongPin)` returns false. Stored value is always a hash, never plaintext.
     - **Validates: Requirements 2.3, 2.4, 2.5**
 
-- [ ] 17. Final checkpoint — Complete application
+- [x] 17. Final checkpoint — Complete application
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

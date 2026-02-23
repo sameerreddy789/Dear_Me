@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { auth, db } from '../services/firebase'
+import { hashPin } from '../utils/pinHash'
 
 const AuthContext = createContext(null)
 
@@ -39,14 +40,32 @@ async function createUserDocIfNeeded(firebaseUser) {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [pinLocked, setPinLocked] = useState(false)
+  const [pinHash, setPinHash] = useState(null)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         await createUserDocIfNeeded(firebaseUser)
         setUser(firebaseUser)
+
+        // Check if user has a PIN set
+        const userRef = doc(db, 'users', firebaseUser.uid)
+        const userSnap = await getDoc(userRef)
+        if (userSnap.exists()) {
+          const userData = userSnap.data()
+          if (userData.pinHash) {
+            setPinHash(userData.pinHash)
+            setPinLocked(true)
+          } else {
+            setPinHash(null)
+            setPinLocked(false)
+          }
+        }
       } else {
         setUser(null)
+        setPinLocked(false)
+        setPinHash(null)
       }
       setLoading(false)
     })
@@ -65,7 +84,6 @@ export function AuthProvider({ children }) {
 
   const signUp = async (email, password, name) => {
     const result = await createUserWithEmailAndPassword(auth, email, password)
-    // Create user doc with the provided name
     const userRef = doc(db, 'users', result.user.uid)
     await setDoc(userRef, {
       name: name || '',
@@ -84,25 +102,39 @@ export function AuthProvider({ children }) {
     await firebaseSignOut(auth)
   }
 
+  /**
+   * Verify a PIN against the stored hash.
+   * @param {string} pin - The plaintext PIN to verify
+   * @returns {Promise<boolean>}
+   */
   const verifyPin = async (pin) => {
     if (!user) return false
-    const userRef = doc(db, 'users', user.uid)
-    const userSnap = await getDoc(userRef)
-    if (!userSnap.exists()) return false
-    const userData = userSnap.data()
-    if (!userData.pinHash) return false
-    return userData.pinHash === btoa(pin)
+    const hashed = await hashPin(pin)
+    if (hashed === pinHash) {
+      setPinLocked(false)
+      return true
+    }
+    return false
   }
 
+  /**
+   * Set (or update) the user's PIN. Hashes before storing.
+   * @param {string} pin - The plaintext PIN to set
+   */
   const setPin = async (pin) => {
     if (!user) return
+    const hashed = await hashPin(pin)
     const userRef = doc(db, 'users', user.uid)
-    await updateDoc(userRef, { pinHash: btoa(pin) })
+    await updateDoc(userRef, { pinHash: hashed })
+    setPinHash(hashed)
+    // Don't lock immediately after setting — user is already authenticated
   }
 
   const value = {
     user,
     loading,
+    pinLocked,
+    pinHash,
     signInWithGoogle,
     signInWithEmail,
     signUp,

@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import PinLockScreen from './PinLockScreen'
 
 function ProtectedRoute() {
-  const { user, loading } = useAuth()
+  const { user, loading, pinLocked } = useAuth()
 
   if (loading) {
     return (
@@ -17,6 +18,10 @@ function ProtectedRoute() {
 
   if (!user) {
     return <Navigate to="/login" replace />
+  }
+
+  if (pinLocked) {
+    return <PinLockScreen />
   }
 
   return <Outlet />

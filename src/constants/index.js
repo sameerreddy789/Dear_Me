@@ -74,3 +74,9 @@ export const MAX_IMAGES = 10;
 export const MAX_TITLE_LENGTH = 200;
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+// Offline resilience keys
+export const OFFLINE_ENTRY_KEY = 'dearme-offline-entry';
+
+// Error codes for quota exceeded detection
+export const QUOTA_ERROR_CODES = ['resource-exhausted', 'quota-exceeded'];

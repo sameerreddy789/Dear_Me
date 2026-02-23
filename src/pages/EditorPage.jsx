@@ -12,9 +12,12 @@ import { saveEntry, getEntry } from '../services/entries'
 import { validateTitle, validateEntryDate } from '../utils/validation'
 import { uploadImage, uploadDrawing } from '../services/storage'
 import { MAX_IMAGES, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '../constants'
+import { saveOfflineEntry, loadOfflineEntry, clearOfflineEntry, isQuotaExceededError, isNetworkError } from '../utils/offline'
+import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import MoodSelector from '../components/MoodSelector'
 import EditorToolbar from '../components/EditorToolbar'
 import DrawingCanvas from '../components/DrawingCanvas'
+import SaveSuccessAnimation from '../components/SaveSuccessAnimation'
 
 const DRAFT_KEY = 'dearme-draft'
 const AUTO_SAVE_INTERVAL = 30000 // 30 seconds
@@ -71,6 +74,11 @@ function EditorPage() {
   const [showDrawingCanvas, setShowDrawingCanvas] = useState(false)
   const [drawingError, setDrawingError] = useState(null)
   const [uploadingDrawing, setUploadingDrawing] = useState(false)
+  const [savedLocally, setSavedLocally] = useState(false)
+  const [showSyncPrompt, setShowSyncPrompt] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+
+  const isOnline = useOnlineStatus()
 
   // Generate a stable temp ID for new entries so images can be uploaded before save
   const tempEntryIdRef = useRef(
@@ -192,6 +200,63 @@ function EditorPage() {
     }
   }, [entryId, title, mood, editor])
 
+  // Requirement 13.2 — Detect reconnection and prompt to sync offline entry
+  useEffect(() => {
+    if (!isOnline || !user) return
+
+    const offlineEntry = loadOfflineEntry()
+    if (offlineEntry && offlineEntry.userId === user.uid) {
+      setShowSyncPrompt(true)
+    }
+  }, [isOnline, user])
+
+  // Sync offline entry to Firestore
+  const handleSyncOfflineEntry = useCallback(async () => {
+    if (!user) return
+
+    const offlineEntry = loadOfflineEntry()
+    if (!offlineEntry) {
+      setShowSyncPrompt(false)
+      return
+    }
+
+    setSyncing(true)
+    setErrors([])
+
+    try {
+      const entryInput = {
+        title: offlineEntry.title,
+        content: offlineEntry.content,
+        mood: offlineEntry.mood,
+        images: offlineEntry.images || [],
+        drawingURL: offlineEntry.drawingURL || null,
+        theme: offlineEntry.theme || 'pastel-pink',
+        date: new Date(offlineEntry.date),
+      }
+
+      await saveEntry(user.uid, entryInput, offlineEntry.existingEntryId || undefined)
+      clearOfflineEntry()
+      setShowSyncPrompt(false)
+      setSavedLocally(false)
+
+      // Show success and redirect
+      setShowSuccess(true)
+      setTimeout(() => navigate('/dashboard'), 1200)
+    } catch (err) {
+      if (isQuotaExceededError(err)) {
+        navigate('/maintenance')
+        return
+      }
+      setErrors([err.message || 'Failed to sync entry. Please try again.'])
+    } finally {
+      setSyncing(false)
+    }
+  }, [user, navigate])
+
+  const dismissSyncPrompt = useCallback(() => {
+    setShowSyncPrompt(false)
+  }, [])
+
   // Image upload handler
   const handleImageUpload = useCallback(async (e) => {
     const file = e.target.files?.[0]
@@ -223,7 +288,11 @@ function EditorPage() {
       const url = await uploadImage(user.uid, uploadEntryId, file)
       setImages((prev) => [...prev, url])
     } catch (err) {
-      setImageError(err.message || 'Failed to upload image. Please try again.')
+      // Requirement 13.3 — Show inline error for storage upload failures
+      const message = isNetworkError(err)
+        ? 'Upload failed — you appear to be offline. You can save the entry without this image.'
+        : (err.message || 'Failed to upload image. Please try again.')
+      setImageError(message)
     } finally {
       setUploading(false)
     }
@@ -247,7 +316,11 @@ function EditorPage() {
       setDrawingURL(url)
       setShowDrawingCanvas(false)
     } catch (err) {
-      setDrawingError(err.message || 'Could not save your drawing. Please try simplifying it.')
+      // Requirement 13.3 — Show inline error for storage upload failures
+      const message = isNetworkError(err)
+        ? 'Drawing upload failed — you appear to be offline. You can save the entry without the drawing.'
+        : (err.message || 'Could not save your drawing. Please try simplifying it.')
+      setDrawingError(message)
     } finally {
       setUploadingDrawing(false)
     }
@@ -261,7 +334,7 @@ function EditorPage() {
     setDrawingURL(null)
   }, [])
 
-  // Task 7.2 — Save entry handler
+  // Task 7.2 — Save entry handler with offline resilience (Req 13.1, 13.4)
   const handleSave = useCallback(async () => {
     if (!editor || !user) return
 
@@ -280,6 +353,7 @@ function EditorPage() {
 
     setErrors([])
     setSaving(true)
+    setSavedLocally(false)
 
     try {
       const entryInput = {
@@ -294,8 +368,9 @@ function EditorPage() {
 
       await saveEntry(user.uid, entryInput, existingEntryId || undefined)
 
-      // Clear draft on successful save
+      // Clear draft and offline entry on successful save
       clearDraft()
+      clearOfflineEntry()
 
       // Show success animation
       setShowSuccess(true)
@@ -305,7 +380,32 @@ function EditorPage() {
         navigate('/dashboard')
       }, 1200)
     } catch (err) {
-      setErrors([err.message || 'Failed to save entry'])
+      // Requirement 13.4 — Quota exceeded → maintenance page
+      if (isQuotaExceededError(err)) {
+        navigate('/maintenance')
+        return
+      }
+
+      // Requirement 13.1 — Network failure → save locally
+      if (isNetworkError(err)) {
+        const offlineData = {
+          userId: user.uid,
+          title: title.trim(),
+          content: editor.getJSON(),
+          mood,
+          images,
+          drawingURL,
+          theme: 'pastel-pink',
+          date: new Date().toISOString(),
+          existingEntryId: existingEntryId || null,
+          savedAt: new Date().toISOString(),
+        }
+        saveOfflineEntry(offlineData)
+        clearDraft()
+        setSavedLocally(true)
+      } else {
+        setErrors([err.message || 'Failed to save entry'])
+      }
     } finally {
       setSaving(false)
     }
@@ -324,25 +424,9 @@ function EditorPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6">
-      {/* Success overlay */}
+      {/* Success overlay with sparkle animation */}
       <AnimatePresence>
-        {showSuccess && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/20"
-          >
-            <motion.div
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-              className="bg-white rounded-3xl p-8 shadow-2xl text-center"
-            >
-              <span className="text-5xl mb-3 block">✨</span>
-              <p className="font-['Caveat'] text-2xl text-pink-600">Entry saved!</p>
-            </motion.div>
-          </motion.div>
-        )}
+        {showSuccess && <SaveSuccessAnimation />}
       </AnimatePresence>
 
       {/* Draft restore prompt */}
@@ -371,6 +455,61 @@ function EditorPage() {
                 className="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 transition-colors"
               >
                 Discard
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Saved locally banner — Requirement 13.1 */}
+      <AnimatePresence>
+        {savedLocally && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-2xl flex items-center gap-3"
+            role="status"
+          >
+            <span className="text-xl">💾</span>
+            <p className="font-['Poppins'] text-sm text-blue-800">
+              Saved locally — will sync when you're back online
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sync prompt — Requirement 13.2 */}
+      <AnimatePresence>
+        {showSyncPrompt && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-4 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center justify-between"
+            role="status"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🌐</span>
+              <p className="font-['Poppins'] text-sm text-green-800">
+                You're back online! You have a locally saved entry ready to sync.
+              </p>
+            </div>
+            <div className="flex gap-2 ml-4">
+              <button
+                type="button"
+                onClick={handleSyncOfflineEntry}
+                disabled={syncing}
+                className="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+              >
+                {syncing ? 'Syncing...' : 'Sync Now'}
+              </button>
+              <button
+                type="button"
+                onClick={dismissSyncPrompt}
+                className="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                Later
               </button>
             </div>
           </motion.div>
@@ -446,10 +585,12 @@ function EditorPage() {
             id="image-upload"
             aria-label="Upload image"
           />
-          <button
+          <motion.button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading || images.length >= MAX_IMAGES}
+            whileHover={!(uploading || images.length >= MAX_IMAGES) ? { scale: 1.05 } : {}}
+            whileTap={!(uploading || images.length >= MAX_IMAGES) ? { scale: 0.95 } : {}}
             className={`px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium transition-colors ${
               uploading || images.length >= MAX_IMAGES
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -457,14 +598,16 @@ function EditorPage() {
             }`}
           >
             {uploading ? 'Uploading...' : '📷 Add Image'}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={() => setShowDrawingCanvas(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className="px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors cursor-pointer"
           >
             🎨 Open Drawing
-          </button>
+          </motion.button>
         </div>
 
         {/* Image error */}

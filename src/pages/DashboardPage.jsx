@@ -10,6 +10,7 @@ import { db } from '../services/firebase'
 import { getRandomQuote } from '../utils/quotes'
 import quotesData from '../data/quotes.json'
 import MoodSelector from '../components/MoodSelector'
+import ThemePicker from '../components/ThemePicker'
 import { MOOD_EMOJIS } from '../constants'
 
 function getGreeting() {
@@ -72,6 +73,21 @@ const containerVariants = {
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
+}
+
+/* floating / breathing animation for accent elements */
+const floatingVariants = {
+  animate: {
+    y: [0, -6, 0],
+    transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+  },
+}
+
+const breathingVariants = {
+  animate: {
+    scale: [1, 1.03, 1],
+    transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+  },
 }
 
 /* ── mood fill colors for heatmap ── */
@@ -196,19 +212,25 @@ function DashboardPage() {
 
       {/* streak + write button row */}
       <motion.div variants={cardVariants} className="flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2 bg-white/80 backdrop-blur rounded-2xl px-5 py-3 shadow-sm border border-pink-100">
+        <motion.div
+          variants={floatingVariants}
+          animate="animate"
+          className="flex items-center gap-2 bg-white/80 backdrop-blur rounded-2xl px-5 py-3 shadow-sm border border-pink-100"
+        >
           <span className="text-2xl">🔥</span>
           <span className="font-['Poppins'] text-lg font-semibold text-[var(--color-text,#4A2040)]">
             {userData?.streak ?? 0} day streak
           </span>
-        </div>
+        </motion.div>
 
-        <button
+        <motion.button
           onClick={() => navigate('/editor')}
-          className="ml-auto bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-['Poppins'] font-medium px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all cursor-pointer"
+          whileHover={{ scale: 1.04, boxShadow: '0 8px 30px rgba(244,114,182,0.3)' }}
+          whileTap={{ scale: 0.97 }}
+          className="ml-auto bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-['Poppins'] font-medium px-6 py-3 rounded-2xl shadow-md transition-colors cursor-pointer"
         >
           ✏️ Write Today's Entry
-        </button>
+        </motion.button>
       </motion.div>
 
       {/* streak heatmap */}
@@ -254,10 +276,15 @@ function DashboardPage() {
           variants={cardVariants}
           className="rounded-2xl p-6 shadow-sm"
           style={{ backgroundColor: quote.backgroundColor }}
+          whileHover={{ scale: 1.02 }}
         >
-          <p className="font-['Caveat'] text-xl sm:text-2xl text-gray-800 leading-relaxed">
+          <motion.p
+            variants={breathingVariants}
+            animate="animate"
+            className="font-['Caveat'] text-xl sm:text-2xl text-gray-800 leading-relaxed"
+          >
             "{quote.text}"
-          </p>
+          </motion.p>
           <p className="font-['Poppins'] text-sm text-gray-600 mt-2">— {quote.author}</p>
         </motion.div>
       )}
@@ -268,6 +295,14 @@ function DashboardPage() {
           How are you feeling right now?
         </h2>
         <MoodSelector value={selectedMood} onChange={setSelectedMood} />
+      </motion.div>
+
+      {/* theme picker */}
+      <motion.div variants={cardVariants} className="bg-white/80 backdrop-blur rounded-2xl p-5 shadow-sm border border-pink-100">
+        <h2 className="font-['Caveat'] text-xl text-[var(--color-text,#4A2040)] mb-3">
+          Customize Your Theme 🎨
+        </h2>
+        <ThemePicker />
       </motion.div>
 
       {/* recent entries */}
@@ -283,30 +318,36 @@ function DashboardPage() {
         ) : (
           <div className="space-y-3">
             {recentEntries.map((entry) => (
-              <Link
+              <motion.div
                 key={entry.id}
-                to={`/editor/${entry.id}`}
-                className="block bg-white/80 backdrop-blur rounded-2xl p-4 shadow-sm border border-pink-100 hover:shadow-md hover:scale-[1.01] transition-all"
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-['Poppins'] font-medium text-[var(--color-text,#4A2040)] truncate">
-                      {entry.title || 'Untitled'}
-                    </h3>
-                    <p className="font-['Poppins'] text-sm text-gray-500 mt-1 line-clamp-2">
-                      {stripContent(entry.content)}
-                    </p>
-                    <span className="font-['Poppins'] text-xs text-gray-400 mt-2 inline-block">
-                      {formatEntryDate(entry.date)}
-                    </span>
+                <Link
+                  to={`/editor/${entry.id}`}
+                  className="block bg-white/80 backdrop-blur rounded-2xl p-4 shadow-sm border border-pink-100 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-['Poppins'] font-medium text-[var(--color-text,#4A2040)] truncate">
+                        {entry.title || 'Untitled'}
+                      </h3>
+                      <p className="font-['Poppins'] text-sm text-gray-500 mt-1 line-clamp-2">
+                        {stripContent(entry.content)}
+                      </p>
+                      <span className="font-['Poppins'] text-xs text-gray-400 mt-2 inline-block">
+                        {formatEntryDate(entry.date)}
+                      </span>
+                    </div>
+                    {entry.mood && (
+                      <span className="text-2xl flex-shrink-0" title={entry.mood}>
+                        {MOOD_EMOJIS[entry.mood] || '📝'}
+                      </span>
+                    )}
                   </div>
-                  {entry.mood && (
-                    <span className="text-2xl flex-shrink-0" title={entry.mood}>
-                      {MOOD_EMOJIS[entry.mood] || '📝'}
-                    </span>
-                  )}
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
           </div>
         )}

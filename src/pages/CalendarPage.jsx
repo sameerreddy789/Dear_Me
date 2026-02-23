@@ -187,23 +187,27 @@ function CalendarPage() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       {/* header with month navigation */}
       <div className="flex items-center justify-between mb-6">
-        <button
+        <motion.button
           onClick={goToPrevMonth}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 shadow-sm border border-pink-100 hover:bg-pink-50 transition-colors cursor-pointer"
           aria-label="Previous month"
         >
           ◀
-        </button>
+        </motion.button>
         <h1 className="font-['Pacifico'] text-2xl sm:text-3xl text-[var(--color-text,#4A2040)]">
           {format(currentMonth, 'MMMM yyyy')} 📅
         </h1>
-        <button
+        <motion.button
           onClick={goToNextMonth}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 shadow-sm border border-pink-100 hover:bg-pink-50 transition-colors cursor-pointer"
           aria-label="Next month"
         >
           ▶
-        </button>
+        </motion.button>
       </div>
 
       {/* day-of-week headers */}
