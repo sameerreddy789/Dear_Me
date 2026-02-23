@@ -1,6 +1,7 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import AnimatedOutlet from './AnimatedOutlet'
+import { useAuth } from '../contexts/AuthContext'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
@@ -9,6 +10,14 @@ const navItems = [
 ]
 
 function Layout() {
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div className="min-h-screen flex bg-[var(--color-background)]">
       {/* Sidebar */}
@@ -47,6 +56,7 @@ function Layout() {
 
         <div className="p-3 border-t border-pink-100">
           <motion.button
+            onClick={handleSignOut}
             whileHover={{ x: 4 }}
             whileTap={{ scale: 0.97 }}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-['Poppins'] text-sm text-[var(--color-text)] hover:bg-red-50 hover:text-red-400 transition-colors cursor-pointer"
