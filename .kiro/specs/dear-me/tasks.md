@@ -115,8 +115,8 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
 - [x] 5. Checkpoint — Core services and validation
   - Ensure all tests pass, ask the user if questions arise.
 
-- [-] 6. Dashboard page
-  - [ ] 6.1 Implement Dashboard page with greeting, streak, quote, and recent entries
+- [x] 6. Dashboard page
+  - [x] 6.1 Implement Dashboard page with greeting, streak, quote, and recent entries
     - Create `src/pages/DashboardPage.tsx`
     - Display time-of-day greeting (morning/afternoon/evening) with user's name
     - Show streak count with 🔥 emoji
