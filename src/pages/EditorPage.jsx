@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { saveEntry, getEntry } from '../services/entries'
 import { validateTitle, validateEntryDate } from '../utils/validation'
 import { uploadImage, uploadDrawing } from '../services/storage'
+import { storage } from '../services/firebase'
 import { MAX_IMAGES, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '../constants'
 import { saveOfflineEntry, loadOfflineEntry, clearOfflineEntry, isQuotaExceededError, isNetworkError } from '../utils/offline'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
@@ -79,6 +80,7 @@ function EditorPage() {
   const [syncing, setSyncing] = useState(false)
 
   const isOnline = useOnlineStatus()
+  const storageAvailable = !!storage
 
   // Generate a stable temp ID for new entries so images can be uploaded before save
   const tempEntryIdRef = useRef(
@@ -588,11 +590,12 @@ function EditorPage() {
           <motion.button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            disabled={uploading || images.length >= MAX_IMAGES}
-            whileHover={!(uploading || images.length >= MAX_IMAGES) ? { scale: 1.05 } : {}}
-            whileTap={!(uploading || images.length >= MAX_IMAGES) ? { scale: 0.95 } : {}}
+            disabled={uploading || images.length >= MAX_IMAGES || !storageAvailable}
+            title={!storageAvailable ? 'Requires Firebase Storage (Blaze plan)' : undefined}
+            whileHover={!(uploading || images.length >= MAX_IMAGES || !storageAvailable) ? { scale: 1.05 } : {}}
+            whileTap={!(uploading || images.length >= MAX_IMAGES || !storageAvailable) ? { scale: 0.95 } : {}}
             className={`px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium transition-colors ${
-              uploading || images.length >= MAX_IMAGES
+              uploading || images.length >= MAX_IMAGES || !storageAvailable
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-pink-100 text-pink-600 hover:bg-pink-200 cursor-pointer'
             }`}
@@ -602,9 +605,15 @@ function EditorPage() {
           <motion.button
             type="button"
             onClick={() => setShowDrawingCanvas(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors cursor-pointer"
+            disabled={!storageAvailable}
+            title={!storageAvailable ? 'Requires Firebase Storage (Blaze plan)' : undefined}
+            whileHover={storageAvailable ? { scale: 1.05 } : {}}
+            whileTap={storageAvailable ? { scale: 0.95 } : {}}
+            className={`px-4 py-1.5 rounded-xl font-['Poppins'] text-sm font-medium transition-colors ${
+              !storageAvailable
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-purple-100 text-purple-600 hover:bg-purple-200 cursor-pointer'
+            }`}
           >
             🎨 Open Drawing
           </motion.button>
