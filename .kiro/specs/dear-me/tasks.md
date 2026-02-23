@@ -141,26 +141,26 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Allow single mood selection with visual highlight
     - _Requirements: 3.5, 11.3_
 
-- [ ] 7. Diary editor — basic writing and saving
-  - [ ] 7.1 Implement DiaryEditor page with TipTap rich text editor
+- [x] 7. Diary editor — basic writing and saving
+  - [x] 7.1 Implement DiaryEditor page with TipTap rich text editor
     - Create `src/pages/EditorPage.tsx` with title input, mood selector, and TipTap editor
     - Configure TipTap with StarterKit, TextStyle, Color, FontFamily, Highlight extensions
     - Create `src/components/EditorToolbar.tsx` with font family (Poppins, Caveat, Pacifico), font size, text color, and background color controls
     - _Requirements: 4.1, 4.2_
 
-  - [ ] 7.2 Wire save entry flow in EditorPage
+  - [x] 7.2 Wire save entry flow in EditorPage
     - On "Save Entry" click, validate input and call `saveEntry` service
     - Display validation errors for empty/long title and future date
     - Show success animation (Framer Motion) and redirect to Dashboard
     - _Requirements: 4.3, 4.5, 4.6, 4.7, 4.9_
 
-  - [ ] 7.3 Implement edit existing entry flow
+  - [x] 7.3 Implement edit existing entry flow
     - When `entryId` route param is present, load entry from Firestore
     - Populate editor with existing title, content, mood, and images
     - On save, update existing entry (no streak change)
     - _Requirements: 4.4_
 
-  - [ ] 7.4 Implement auto-save drafts to localStorage
+  - [x] 7.4 Implement auto-save drafts to localStorage
     - Periodically save editor state (title, content, mood) to localStorage
     - On EditorPage mount, check for existing draft and offer to restore
     - Clear draft on successful save to Firestore
@@ -170,7 +170,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 5: Rich Text Round-Trip** — For any valid TipTap JSONContent, `JSON.parse(JSON.stringify(content))` deep-equals the original content
     - **Validates: Requirements 11.7**
 
-- [ ] 8. Checkpoint — Editor and dashboard functional
+- [x] 8. Checkpoint — Editor and dashboard functional
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Image upload
