@@ -210,8 +210,8 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Handle export failure with error toast and preserved canvas state
     - _Requirements: 6.3, 6.5_
 
-- [ ] 11. Calendar view and streak heatmap
-  - [ ] 11.1 Implement CalendarView page
+- [x] 11. Calendar view and streak heatmap
+  - [x] 11.1 Implement CalendarView page
     - Create `src/pages/CalendarPage.tsx` with a monthly calendar grid
     - Query entries for the displayed month using `getEntriesForMonth`
     - Render mood-colored dots on dates with entries
@@ -219,13 +219,13 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - Show empty grid for months with no entries
     - _Requirements: 8.1, 8.2, 8.4, 8.7_
 
-  - [ ] 11.2 Implement entry read mode with page-flip animation
+  - [x] 11.2 Implement entry read mode with page-flip animation
     - On date click, open the entry in a read-only view
     - Use Framer Motion for page-flip transition animation
     - Display full entry content, images, and drawing
     - _Requirements: 8.3_
 
-  - [ ] 11.3 Implement streak heatmap on Dashboard
+  - [x] 11.3 Implement streak heatmap on Dashboard
     - Add `react-calendar-heatmap` component to DashboardPage
     - Query entry dates for the past year
     - Color-code heatmap cells by mood
@@ -235,7 +235,7 @@ Build a React + Vite + Tailwind CSS + Firebase digital diary web app from scratc
     - **Property 6: Calendar-Entry Consistency** — For any month, the set of dates with mood dots equals the set of dates with entries in Firestore for that user and month
     - **Validates: Requirements 8.1, 8.2**
 
-- [ ] 12. Checkpoint — Full feature set functional
+- [x] 12. Checkpoint — Full feature set functional
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 13. Theme system

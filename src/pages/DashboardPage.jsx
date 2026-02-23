@@ -1,7 +1,10 @@
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore'
+import { subYears, format } from 'date-fns'
+import CalendarHeatmap from 'react-calendar-heatmap'
+import 'react-calendar-heatmap/dist/styles.css'
 import { useAuth } from '../contexts/AuthContext'
 import { db } from '../services/firebase'
 import { getRandomQuote } from '../utils/quotes'
@@ -71,19 +74,31 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
 }
 
+/* ── mood fill colors for heatmap ── */
+const MOOD_FILL_COLORS = {
+  happy: '#fde047',
+  sad: '#93c5fd',
+  productive: '#86efac',
+  romantic: '#f9a8d4',
+  anxious: '#fdba74',
+  calm: '#5eead4',
+  neutral: '#d1d5db',
+}
+
 function DashboardPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
   const [userData, setUserData] = useState(null)
   const [recentEntries, setRecentEntries] = useState([])
+  const [heatmapValues, setHeatmapValues] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedMood, setSelectedMood] = useState(null)
 
   const greeting = useMemo(() => getGreeting(), [])
   const quote = useMemo(() => getRandomQuote(quotesData), [])
 
-  /* fetch user doc + recent entries on mount */
+  /* fetch user doc + recent entries + heatmap data on mount */
   useEffect(() => {
     if (!user) return
 
@@ -108,6 +123,29 @@ function DashboardPage() {
         if (!cancelled) {
           setRecentEntries(
             entriesSnap.docs.map((d) => ({ id: d.id, ...d.data() })),
+          )
+        }
+
+        // heatmap: entries from the past year
+        const oneYearAgo = subYears(new Date(), 1)
+        const heatmapQuery = query(
+          collection(db, 'entries'),
+          where('userId', '==', user.uid),
+          where('date', '>=', Timestamp.fromDate(oneYearAgo)),
+          orderBy('date', 'asc'),
+        )
+        const heatmapSnap = await getDocs(heatmapQuery)
+        if (!cancelled) {
+          setHeatmapValues(
+            heatmapSnap.docs.map((d) => {
+              const data = d.data()
+              const entryDate = data.date.toDate()
+              return {
+                date: format(entryDate, 'yyyy-MM-dd'),
+                count: 1,
+                mood: data.mood,
+              }
+            }),
           )
         }
       } catch (err) {
@@ -171,6 +209,43 @@ function DashboardPage() {
         >
           ✏️ Write Today's Entry
         </button>
+      </motion.div>
+
+      {/* streak heatmap */}
+      <motion.div
+        variants={cardVariants}
+        className="bg-white/80 backdrop-blur rounded-2xl p-5 shadow-sm border border-pink-100"
+      >
+        <h2 className="font-['Caveat'] text-xl text-[var(--color-text,#4A2040)] mb-3">
+          Your Year in Entries 🗓️
+        </h2>
+        <div className="overflow-x-auto">
+          <CalendarHeatmap
+            startDate={subYears(new Date(), 1)}
+            endDate={new Date()}
+            values={heatmapValues}
+            classForValue={(value) => {
+              if (!value) return 'color-empty'
+              return 'color-filled'
+            }}
+            titleForValue={(value) => {
+              if (!value) return 'No entry'
+              const emoji = MOOD_EMOJIS[value.mood] || ''
+              return `${value.date} — ${value.mood} ${emoji}`
+            }}
+            transformDayElement={(element, value) => {
+              if (!value || !value.mood) return element
+              return React.cloneElement(element, {
+                ...element.props,
+                style: {
+                  ...element.props.style,
+                  fill: MOOD_FILL_COLORS[value.mood] || '#d1d5db',
+                },
+              })
+            }}
+            showWeekdayLabels
+          />
+        </div>
       </motion.div>
 
       {/* motivational quote */}
