@@ -1,10 +1,10 @@
 export const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAxyTGrhmOjjjssAdxHe0aETXhtyH3DvVg",
+    authDomain: "dearme-9d252.firebaseapp.com",
+    projectId: "dearme-9d252",
+    storageBucket: "dearme-9d252.firebasestorage.app",
+    messagingSenderId: "930158731619",
+    appId: "1:930158731619:web:fb80cc207f81e477d3b356"
 };
 
 export const MOODS = ['happy', 'sad', 'productive', 'romantic', 'anxious', 'calm', 'neutral'];
