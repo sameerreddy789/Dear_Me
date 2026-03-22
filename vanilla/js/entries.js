@@ -91,16 +91,31 @@ export async function getRecentEntries(limit = 5) {
     const user = getCurrentUser();
     if (!user) return [];
     
-    const snapshot = await db.collection('entries')
-        .where('userId', '==', user.uid)
-        .orderBy('date', 'desc')
-        .limit(limit)
-        .get();
-    
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    }));
+    try {
+        const snapshot = await db.collection('entries')
+            .where('userId', '==', user.uid)
+            .orderBy('date', 'desc')
+            .limit(limit)
+            .get();
+        
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+    } catch (error) {
+        console.warn('Index not ready, fetching all entries:', error);
+        const snapshot = await db.collection('entries')
+            .where('userId', '==', user.uid)
+            .get();
+        
+        const entries = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        
+        entries.sort((a, b) => b.date.toMillis() - a.date.toMillis());
+        return entries.slice(0, limit);
+    }
 }
 
 export async function getEntriesForMonth(year, month) {
@@ -110,23 +125,49 @@ export async function getEntriesForMonth(year, month) {
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 0, 23, 59, 59);
     
-    const snapshot = await db.collection('entries')
-        .where('userId', '==', user.uid)
-        .where('date', '>=', firebase.firestore.Timestamp.fromDate(startDate))
-        .where('date', '<=', firebase.firestore.Timestamp.fromDate(endDate))
-        .orderBy('date', 'asc')
-        .get();
-    
-    return snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-            id: doc.id,
-            date: data.date.toDate(),
-            title: data.title,
-            mood: data.mood,
-            content: data.content
-        };
-    });
+    try {
+        const snapshot = await db.collection('entries')
+            .where('userId', '==', user.uid)
+            .where('date', '>=', firebase.firestore.Timestamp.fromDate(startDate))
+            .where('date', '<=', firebase.firestore.Timestamp.fromDate(endDate))
+            .orderBy('date', 'asc')
+            .get();
+        
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                date: data.date.toDate(),
+                title: data.title,
+                mood: data.mood,
+                content: data.content
+            };
+        });
+    } catch (error) {
+        console.warn('Index not ready, filtering client-side:', error);
+        const snapshot = await db.collection('entries')
+            .where('userId', '==', user.uid)
+            .get();
+        
+        const entries = snapshot.docs
+            .map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    date: data.date.toDate(),
+                    title: data.title,
+                    mood: data.mood,
+                    content: data.content
+                };
+            })
+            .filter(entry => {
+                const entryDate = entry.date;
+                return entryDate >= startDate && entryDate <= endDate;
+            })
+            .sort((a, b) => a.date - b.date);
+        
+        return entries;
+    }
 }
 
 export async function getEntriesForYear(year) {
@@ -136,19 +177,43 @@ export async function getEntriesForYear(year) {
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31, 23, 59, 59);
     
-    const snapshot = await db.collection('entries')
-        .where('userId', '==', user.uid)
-        .where('date', '>=', firebase.firestore.Timestamp.fromDate(startDate))
-        .where('date', '<=', firebase.firestore.Timestamp.fromDate(endDate))
-        .orderBy('date', 'asc')
-        .get();
-    
-    return snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-            id: doc.id,
-            date: data.date.toDate(),
-            mood: data.mood
-        };
-    });
+    try {
+        const snapshot = await db.collection('entries')
+            .where('userId', '==', user.uid)
+            .where('date', '>=', firebase.firestore.Timestamp.fromDate(startDate))
+            .where('date', '<=', firebase.firestore.Timestamp.fromDate(endDate))
+            .orderBy('date', 'asc')
+            .get();
+        
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                date: data.date.toDate(),
+                mood: data.mood
+            };
+        });
+    } catch (error) {
+        console.warn('Index not ready, filtering client-side:', error);
+        const snapshot = await db.collection('entries')
+            .where('userId', '==', user.uid)
+            .get();
+        
+        const entries = snapshot.docs
+            .map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    date: data.date.toDate(),
+                    mood: data.mood
+                };
+            })
+            .filter(entry => {
+                const entryDate = entry.date;
+                return entryDate >= startDate && entryDate <= endDate;
+            })
+            .sort((a, b) => a.date - b.date);
+        
+        return entries;
+    }
 }
