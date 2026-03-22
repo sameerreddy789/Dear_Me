@@ -1,189 +1,134 @@
 # DearMe ✨ — Your Digital Diary
 
-> _A warm, aesthetic, and safe space to capture your thoughts, doodles, and memories — one page at a time._
-
-DearMe is a beautiful digital diary web app designed for anyone who loves journaling. Available in two versions: React (full-featured) and Vanilla JavaScript (lightweight).
-
----
-
-## 📦 Two Versions Available
-
-### 🎯 Vanilla JavaScript Version (Recommended for Quick Start)
-**Location:** `/vanilla` folder
-
-Pure HTML, CSS, and JavaScript - no build tools required!
-
-```bash
-cd vanilla
-python -m http.server 8000
-```
-
-**Features:**
-- ✅ No build step required
-- ✅ Smaller bundle size
-- ✅ Faster initial load
-- ✅ All core features included
-- ✅ Firebase authentication & database
-- ✅ Mood tracking & calendar
-- ✅ Streak tracking & themes
-
-[📖 Vanilla Version Documentation](./vanilla/README.md)
-
----
-
-### ⚛️ React Version (Full-Featured)
-**Location:** Root folder
-
-Advanced features with React, TipTap, and Fabric.js
-
-```bash
-npm install
-npm run dev
-```
-
-**Additional Features:**
-- 🎨 Drawing canvas with Fabric.js
-- ✍️ Advanced rich text editor (TipTap)
-- 🖼️ Image uploads
-- 🎬 Framer Motion animations
-- 🔒 PIN lock security
-
----
-
-## 🌸 Core Features (Both Versions)
-
-| Feature | Description |
-|---|---|
-| 🔐 **Authentication** | Google sign-in and email/password |
-| 📝 **Diary Entries** | Create and edit journal entries |
-| 😊 **Mood Tracking** | Track your emotions with emojis |
-| 📅 **Calendar View** | Monthly calendar with mood indicators |
-| 🔥 **Streak System** | Daily writing streaks with heatmap |
-| 🎀 **Themes** | 5 beautiful pastel color schemes |
-| 🌙 **Dark Mode** | Easy on the eyes for night writing |
-| 💾 **Offline Support** | Works offline with Firestore persistence |
-
----
+A beautiful, lightweight digital diary app built with pure HTML, CSS, and JavaScript.
 
 ## 🚀 Quick Start
 
-### For Vanilla Version (Easiest)
+```bash
+# Start local server
+python -m http.server 8000
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/sameerreddy789/Dear_Me.git
-   cd Dear_Me/vanilla
-   ```
+# Open browser
+http://localhost:8000
+```
 
-2. **Start local server**
-   ```bash
-   python -m http.server 8000
-   ```
+## ✨ Features
 
-3. **Open browser**
-   ```
-   http://localhost:8000
-   ```
-
-4. **Sign in and start journaling!**
-
-### For React Version
-
-1. **Clone and install**
-   ```bash
-   git clone https://github.com/sameerreddy789/Dear_Me.git
-   cd Dear_Me
-   npm install
-   ```
-
-2. **Configure Firebase**
-   - Copy `.env.example` to `.env`
-   - Add your Firebase credentials
-
-3. **Run development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open browser**
-   ```
-   http://localhost:5173
-   ```
-
----
-
-## 🛠 Tech Stack
-
-### Vanilla Version
-- HTML5, CSS3, JavaScript (ES6+)
-- Firebase (Auth, Firestore)
-- ES6 Modules
-- No build tools
-
-### React Version
-- React 19
-- Vite
-- Tailwind CSS
-- TipTap (Rich text editor)
-- Fabric.js (Drawing canvas)
-- Framer Motion (Animations)
-- Firebase (Auth, Firestore, Storage)
-
----
+- 📝 Create and edit diary entries
+- 😊 Mood tracking with emojis
+- 📅 Calendar view with mood indicators
+- 🔥 Daily streak tracking
+- 📊 Year heatmap visualization
+- 🎨 5 beautiful pastel themes
+- 🌙 Dark mode support
+- 🔐 Google Sign-In & Email/Password authentication
+- 💾 Offline persistence with Firestore
 
 ## 📁 Project Structure
 
 ```
-Dear_Me/
-├── vanilla/              # Vanilla JS version (standalone)
-│   ├── index.html
-│   ├── css/
-│   ├── js/
-│   └── README.md
-├── src/                  # React version
+DearMe/
+├── index.html              # Main HTML file
+├── css/
+│   └── styles.css         # All styles
+├── js/
+│   ├── app.js             # App initialization
+│   ├── auth.js            # Authentication
+│   ├── config.js          # Firebase configuration
+│   ├── entries.js         # Entry CRUD operations
+│   ├── router.js          # Client-side routing
+│   ├── theme.js           # Theme management
 │   ├── components/
-│   ├── pages/
-│   ├── contexts/
-│   └── services/
-├── package.json
-└── README.md
+│   │   └── navbar.js      # Navigation bar
+│   └── pages/
+│       ├── login.js       # Login page
+│       ├── dashboard.js   # Dashboard
+│       ├── editor.js      # Entry editor
+│       └── calendar.js    # Calendar view
+└── firestore.indexes.json # Firestore indexes configuration
 ```
-
----
 
 ## 🔧 Firebase Setup
 
-Both versions require Firebase:
+The app is already configured with Firebase. If you need to use your own Firebase project:
 
-1. Create a project at [Firebase Console](https://console.firebase.google.com)
-2. Enable Authentication (Google + Email/Password)
-3. Create Firestore Database
-4. Copy your config credentials
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Create a new project
+3. Enable Authentication (Google + Email/Password)
+4. Create Firestore Database
+5. Copy your config and update `js/config.js`:
 
-**For Vanilla:** Edit `vanilla/js/config.js`  
-**For React:** Edit `.env` file
-
----
-
-## 🧪 Testing
-
-React version includes comprehensive tests:
-
-```bash
-npm run test
+```javascript
+export const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
 ```
 
----
+### Creating Firestore Indexes
+
+When you first run the app, you may see an error about missing indexes:
+
+1. Click the link in the error message
+2. Click "Create Index" in Firebase Console
+3. Wait 1-2 minutes for the index to build
+4. Refresh the app
+
+The app will work with fallback queries while indexes are building.
+
+## 🛠 Tech Stack
+
+- Pure HTML5, CSS3, JavaScript (ES6+)
+- Firebase Authentication
+- Cloud Firestore
+- ES6 Modules
+- No build tools or frameworks required
+
+## 📝 Usage
+
+1. **Sign In** - Use Google or create an account with email/password
+2. **Write Entry** - Click "Write Today's Entry" button
+3. **Select Mood** - Choose how you're feeling with emoji buttons
+4. **Rich Text** - Use the toolbar to format your text (bold, italic, lists)
+5. **Save** - Your entry is automatically saved to Firestore
+6. **View Calendar** - See all your entries organized by date
+7. **Track Streak** - Keep your daily writing streak going!
+
+## 🎨 Themes
+
+Choose from 5 beautiful color schemes:
+- 🌸 Pastel Pink (default)
+- 🌙 Midnight Blue
+- 🌻 Soft Yellow
+- 🍃 Mint Green
+- ☁️ Cloud White
+
+Toggle dark mode for comfortable night-time journaling.
+
+## 🔧 Troubleshooting
+
+### "The query requires an index" Error
+- Click the link in the error message
+- Click "Create Index" in Firebase Console
+- Wait 1-2 minutes
+- Refresh the app
+
+### Login Issues
+- Verify Firebase Authentication is enabled
+- Check Google Sign-In is configured in Firebase Console
+- Ensure your Firebase config is correct in `js/config.js`
+
+### 404 Errors
+- Make sure you're running a local server (not opening HTML file directly)
+- ES6 modules require HTTP/HTTPS protocol
 
 ## 📄 License
 
 MIT License
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Please feel free to submit a Pull Request.
 
 ---
 
