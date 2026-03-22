@@ -2,181 +2,188 @@
 
 > _A warm, aesthetic, and safe space to capture your thoughts, doodles, and memories — one page at a time._
 
-DearMe is a beautiful digital diary web app designed for anyone who loves journaling but wants something more personal than a plain text editor. Write rich entries, draw doodles, track your mood, build streaks, and wrap it all in soft pastel themes that feel like home.
+DearMe is a beautiful digital diary web app designed for anyone who loves journaling. Available in two versions: React (full-featured) and Vanilla JavaScript (lightweight).
 
 ---
 
-## 📸 Screenshots
+## 📦 Two Versions Available
 
-> _Screenshots coming soon! Stay tuned for a peek at DearMe's pastel-powered interface._
+### 🎯 Vanilla JavaScript Version (Recommended for Quick Start)
+**Location:** `/vanilla` folder
+
+Pure HTML, CSS, and JavaScript - no build tools required!
+
+```bash
+cd vanilla
+python -m http.server 8000
+```
+
+**Features:**
+- ✅ No build step required
+- ✅ Smaller bundle size
+- ✅ Faster initial load
+- ✅ All core features included
+- ✅ Firebase authentication & database
+- ✅ Mood tracking & calendar
+- ✅ Streak tracking & themes
+
+[📖 Vanilla Version Documentation](./vanilla/README.md)
 
 ---
 
-## 🌸 Features
+### ⚛️ React Version (Full-Featured)
+**Location:** Root folder
 
-| | Feature | Description |
-|---|---|---|
-| 🔐 | **Authentication** | Google sign-in and email/password with Firebase Auth |
-| ✍️ | **Rich Text Editor** | TipTap-powered editor with fonts, colors, sizes, and formatting |
-| 🎨 | **Drawing Canvas** | Freehand doodles with pencil, eraser, and color tools via Fabric.js |
-| 😊 | **Mood Tracking** | Log your mood per entry — happy, calm, productive, romantic, and more |
-| 📅 | **Calendar View** | Monthly calendar with mood-colored dots and click-to-open entries |
-| 🔥 | **Streak System** | Daily writing streaks with a heatmap to keep you motivated |
-| 🎀 | **Themes** | 5 gorgeous pastel themes to match your vibe |
-| 💬 | **Motivational Quotes** | A fresh quote every day to brighten your page |
-| 🔒 | **PIN Lock** | Extra privacy layer for your diary |
-| 🌙 | **Dark Mode** | Easy on the eyes for late-night journaling |
+Advanced features with React, TipTap, and Fabric.js
+
+```bash
+npm install
+npm run dev
+```
+
+**Additional Features:**
+- 🎨 Drawing canvas with Fabric.js
+- ✍️ Advanced rich text editor (TipTap)
+- 🖼️ Image uploads
+- 🎬 Framer Motion animations
+- 🔒 PIN lock security
+
+---
+
+## 🌸 Core Features (Both Versions)
+
+| Feature | Description |
+|---|---|
+| 🔐 **Authentication** | Google sign-in and email/password |
+| 📝 **Diary Entries** | Create and edit journal entries |
+| 😊 **Mood Tracking** | Track your emotions with emojis |
+| 📅 **Calendar View** | Monthly calendar with mood indicators |
+| 🔥 **Streak System** | Daily writing streaks with heatmap |
+| 🎀 **Themes** | 5 beautiful pastel color schemes |
+| 🌙 **Dark Mode** | Easy on the eyes for night writing |
+| 💾 **Offline Support** | Works offline with Firestore persistence |
+
+---
+
+## 🚀 Quick Start
+
+### For Vanilla Version (Easiest)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/sameerreddy789/Dear_Me.git
+   cd Dear_Me/vanilla
+   ```
+
+2. **Start local server**
+   ```bash
+   python -m http.server 8000
+   ```
+
+3. **Open browser**
+   ```
+   http://localhost:8000
+   ```
+
+4. **Sign in and start journaling!**
+
+### For React Version
+
+1. **Clone and install**
+   ```bash
+   git clone https://github.com/sameerreddy789/Dear_Me.git
+   cd Dear_Me
+   npm install
+   ```
+
+2. **Configure Firebase**
+   - Copy `.env.example` to `.env`
+   - Add your Firebase credentials
+
+3. **Run development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open browser**
+   ```
+   http://localhost:5173
+   ```
 
 ---
 
 ## 🛠 Tech Stack
 
-| Technology | Role |
-|---|---|
-| [React](https://react.dev) | UI framework |
-| [Vite](https://vitejs.dev) | Build tool & dev server |
-| [Tailwind CSS](https://tailwindcss.com) | Utility-first styling |
-| [Framer Motion](https://www.framer.com/motion/) | Animations & page transitions |
-| [TipTap](https://tiptap.dev) | Rich text editor |
-| [Fabric.js](http://fabricjs.com) | Drawing canvas |
-| [Firebase](https://firebase.google.com) | Auth, Firestore, Storage |
-| [date-fns](https://date-fns.org) | Date utilities |
-| [react-calendar-heatmap](https://github.com/kevinsqi/react-calendar-heatmap) | Streak visualization |
-| [Pacifico / Caveat / Poppins](https://fonts.google.com) | Typography |
+### Vanilla Version
+- HTML5, CSS3, JavaScript (ES6+)
+- Firebase (Auth, Firestore)
+- ES6 Modules
+- No build tools
 
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** 18+ and npm
-- A **Firebase** project with Auth, Firestore, and Storage enabled
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/dearme.git
-cd dearme
-
-# Install dependencies
-npm install
-```
-
-### Firebase Setup
-
-1. Create a project at [Firebase Console](https://console.firebase.google.com)
-2. Enable **Google sign-in** and **Email/Password** in Authentication
-3. Create a **Firestore** database
-4. Enable **Firebase Storage**
-5. Copy your Firebase config and create a `.env` file in the project root:
-
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-### Run
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:5173](http://localhost:5173) and start journaling 🌷
+### React Version
+- React 19
+- Vite
+- Tailwind CSS
+- TipTap (Rich text editor)
+- Fabric.js (Drawing canvas)
+- Framer Motion (Animations)
+- Firebase (Auth, Firestore, Storage)
 
 ---
 
 ## 📁 Project Structure
 
 ```
-dearme/
-├── public/
-│   └── textures/            # Paper texture assets
-├── src/
-│   ├── components/          # Reusable UI components
-│   ├── pages/               # Route pages (Dashboard, Editor, Calendar, Login)
-│   ├── context/             # AuthProvider, ThemeProvider
-│   ├── hooks/               # Custom React hooks
-│   ├── services/            # Firebase service functions (auth, entries, storage)
-│   ├── utils/               # Helpers (streak calc, date utils, quotes)
-│   ├── data/                # Static data (quotes.json)
-│   ├── styles/              # Global styles and Tailwind config
-│   ├── App.tsx
-│   └── main.tsx
-├── .env                     # Firebase config (not committed)
-├── index.html
-├── tailwind.config.js
-├── vite.config.ts
-└── package.json
+Dear_Me/
+├── vanilla/              # Vanilla JS version (standalone)
+│   ├── index.html
+│   ├── css/
+│   ├── js/
+│   └── README.md
+├── src/                  # React version
+│   ├── components/
+│   ├── pages/
+│   ├── contexts/
+│   └── services/
+├── package.json
+└── README.md
 ```
 
 ---
 
-## 🎀 Design Themes
+## 🔧 Firebase Setup
 
-DearMe ships with 5 hand-picked themes:
+Both versions require Firebase:
 
-| Theme | Vibe |
-|---|---|
-| 🌸 **Pastel Pink** | Soft, warm, and romantic |
-| 🌙 **Midnight Blue** | Deep, calm, and reflective |
-| 🌻 **Soft Yellow** | Sunny, cheerful, and bright |
-| 🍃 **Mint Green** | Fresh, peaceful, and grounding |
-| ☁️ **Cloud White** | Clean, minimal, and airy |
+1. Create a project at [Firebase Console](https://console.firebase.google.com)
+2. Enable Authentication (Google + Email/Password)
+3. Create Firestore Database
+4. Copy your config credentials
 
-Each theme includes matching paper textures, shadows, and accent colors.
-
----
-
-## 📋 Development Phases
-
-| Phase | Focus |
-|---|---|
-| **Phase 1** | Authentication (Google + email/password) and basic diary entry creation |
-| **Phase 2** | Rich text editing, color/font customization, and image uploads |
-| **Phase 3** | Drawing canvas, calendar view, and streak heatmap |
-| **Phase 4** | Themes, animations, motivational quotes system, and polish |
+**For Vanilla:** Edit `vanilla/js/config.js`  
+**For React:** Edit `.env` file
 
 ---
 
 ## 🧪 Testing
 
-- **Vitest** — Fast unit and integration test runner
-- **React Testing Library** — Component testing with a focus on user behavior
-- **fast-check** — Property-based testing for core logic (streak calculation, quote selection, theme application)
+React version includes comprehensive tests:
 
 ```bash
-# Run tests
 npm run test
-
-# Run with coverage
-npm run test -- --coverage
 ```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -m 'Add your feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
-
-Please keep the code clean, write tests for new features, and follow the existing code style.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
+MIT License
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Please feel free to submit a Pull Request.
 
 ---
 
