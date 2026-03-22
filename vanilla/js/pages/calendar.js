@@ -23,19 +23,12 @@ export async function renderCalendarPage() {
                 <h1 class="font-pacifico" style="font-size: 2rem;" id="month-title"></h1>
                 <button class="calendar-nav-btn" id="next-month">▶</button>
             </div>
-            
-            <div id="calendar-content">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
+            <div id="calendar-content"><div class="loading"><div class="spinner"></div></div></div>
         </div>
         
         <div id="entry-modal" class="modal-overlay hidden">
             <div class="modal-content">
-                <button id="close-modal" style="position: absolute; top: 1rem; right: 1rem; width: 2rem; height: 2rem; border: none; border-radius: 50%; background: rgba(255, 182, 193, 0.2); cursor: pointer; font-size: 1.25rem;">
-                    ✕
-                </button>
+                <button id="close-modal" style="position: absolute; top: 1rem; right: 1rem; width: 2rem; height: 2rem; border: none; border-radius: 50%; background: rgba(255, 182, 193, 0.2); cursor: pointer; font-size: 1.25rem;">✕</button>
                 <div id="modal-body"></div>
             </div>
         </div>
@@ -60,14 +53,11 @@ export async function renderCalendarPage() {
 }
 
 async function loadCalendar() {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    
     document.getElementById('month-title').textContent = 
         currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + ' 📅';
     
     try {
-        entries = await getEntriesForMonth(year, month);
+        entries = await getEntriesForMonth(currentMonth.getFullYear(), currentMonth.getMonth());
         renderCalendar();
     } catch (error) {
         document.getElementById('calendar-content').innerHTML = `
@@ -81,15 +71,12 @@ async function loadCalendar() {
 function renderCalendar() {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
-    
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
     const days = [];
     const current = new Date(startDate);
-    
     while (days.length < 42) {
         days.push(new Date(current));
         current.setDate(current.getDate() + 1);
@@ -97,8 +84,7 @@ function renderCalendar() {
     
     const entryMap = {};
     entries.forEach(entry => {
-        const dateStr = entry.date.toISOString().split('T')[0];
-        entryMap[dateStr] = entry;
+        entryMap[entry.date.toISOString().split('T')[0]] = entry;
     });
     
     const today = new Date();
@@ -123,10 +109,8 @@ function renderCalendar() {
         if (isToday) classes.push('today');
         if (entry) classes.push('has-entry');
         
-        const style = !isCurrentMonth ? 'opacity: 0.3;' : '';
-        
         html += `
-            <div class="${classes.join(' ')}" style="${style}" ${entry ? `onclick="showEntry('${entry.id}')"` : ''}>
+            <div class="${classes.join(' ')}" style="${!isCurrentMonth ? 'opacity: 0.3;' : ''}" ${entry ? `onclick="showEntry('${entry.id}')"` : ''}>
                 <span style="font-size: 0.85rem;">${day.getDate()}</span>
                 ${entry ? `<div class="mood-dot" style="background: ${MOOD_COLORS[entry.mood] || '#d1d5db'};"></div>` : ''}
             </div>
@@ -155,42 +139,15 @@ window.showEntry = async function(entryId) {
             <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <span style="font-size: 2rem;">${emoji}</span>
                 <div>
-                    <h2 class="font-pacifico" style="font-size: 1.75rem; margin-bottom: 0.25rem;">
-                        ${entry.title || 'Untitled'}
-                    </h2>
+                    <h2 class="font-pacifico" style="font-size: 1.75rem; margin-bottom: 0.25rem;">${entry.title || 'Untitled'}</h2>
                     <p style="font-size: 0.85rem; color: #999;">${dateStr}</p>
                 </div>
             </div>
-            
-            <div style="white-space: pre-wrap; line-height: 1.8; margin-bottom: 1.5rem;">
-                ${content}
-            </div>
-            
-            ${entry.images && entry.images.length > 0 ? `
-                <div class="grid grid-cols-2 gap-2 mb-4">
-                    ${entry.images.map((url, i) => 
-                        `<img src="${url}" alt="Entry image ${i + 1}" style="width: 100%; height: 8rem; object-fit: cover; border-radius: 0.75rem;">`
-                    ).join('')}
-                </div>
-            ` : ''}
-            
-            ${entry.drawingURL ? `
-                <div style="margin-bottom: 1rem;">
-                    <p class="font-caveat" style="font-size: 1.25rem; color: #666; margin-bottom: 0.5rem;">Drawing ✏️</p>
-                    <img src="${entry.drawingURL}" alt="Drawing" style="width: 100%; border-radius: 0.75rem; border: 1px solid rgba(255, 182, 193, 0.2);">
-                </div>
-            ` : ''}
-            
-            <button class="btn btn-primary" onclick="window.navigateTo('/editor/${entry.id}')" style="width: 100%;">
-                Edit Entry
-            </button>
+            <div style="white-space: pre-wrap; line-height: 1.8; margin-bottom: 1.5rem;">${content}</div>
+            <button class="btn btn-primary" onclick="window.navigateTo('/editor/${entry.id}')" style="width: 100%;">Edit Entry</button>
         `;
     } catch (error) {
-        modalBody.innerHTML = `
-            <div style="text-align: center; padding: 2rem;">
-                <p style="color: #c33;">Failed to load entry: ${error.message}</p>
-            </div>
-        `;
+        modalBody.innerHTML = `<div style="text-align: center; padding: 2rem;"><p style="color: #c33;">Failed to load entry: ${error.message}</p></div>`;
     }
 };
 
@@ -201,7 +158,6 @@ function closeModal() {
 function extractText(content) {
     if (typeof content === 'string') return content;
     if (!content) return '';
-    
     let text = '';
     function walk(node) {
         if (node.text) text += node.text + ' ';

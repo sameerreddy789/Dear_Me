@@ -1,4 +1,4 @@
-import { getCurrentUser, getUserData, signOut } from '../auth.js';
+import { getCurrentUser, getUserData } from '../auth.js';
 import { getRecentEntries, getEntriesForYear } from '../entries.js';
 import { MOOD_EMOJIS, MOOD_COLORS } from '../config.js';
 import { renderNavbar } from '../components/navbar.js';
@@ -15,11 +15,7 @@ export async function renderDashboardPage() {
     app.innerHTML = `
         ${renderNavbar()}
         <div class="page-container">
-            <div id="dashboard-content">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
+            <div id="dashboard-content"><div class="loading"><div class="spinner"></div></div></div>
         </div>
     `;
     
@@ -44,23 +40,18 @@ export async function renderDashboardPage() {
                     <span style="font-size: 2rem;">🔥</span>
                     <span style="font-size: 1.25rem; font-weight: 600;">${streak} day streak</span>
                 </div>
-                
                 <button class="btn btn-primary" onclick="window.navigateTo('/editor')" style="margin-left: auto;">
                     ✏️ Write Today's Entry
                 </button>
             </div>
             
             <div class="card mb-4">
-                <h2 class="font-caveat" style="font-size: 1.5rem; margin-bottom: 1rem;">
-                    Your Year in Entries 🗓️
-                </h2>
+                <h2 class="font-caveat" style="font-size: 1.5rem; margin-bottom: 1rem;">Your Year in Entries 🗓️</h2>
                 <div id="heatmap-container"></div>
             </div>
             
             <div class="card mb-4">
-                <h2 class="font-caveat" style="font-size: 1.5rem; margin-bottom: 1rem;">
-                    Recent Entries 📝
-                </h2>
+                <h2 class="font-caveat" style="font-size: 1.5rem; margin-bottom: 1rem;">Recent Entries 📝</h2>
                 <div id="recent-entries"></div>
             </div>
         `;
@@ -85,18 +76,14 @@ function getGreeting() {
 }
 
 function renderHeatmap(entries) {
-    const container = document.getElementById('heatmap-container');
+    const entryMap = {};
+    entries.forEach(entry => {
+        entryMap[entry.date.toISOString().split('T')[0]] = entry.mood;
+    });
+    
     const today = new Date();
     const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
     
-    // Create a map of dates to moods
-    const entryMap = {};
-    entries.forEach(entry => {
-        const dateStr = entry.date.toISOString().split('T')[0];
-        entryMap[dateStr] = entry.mood;
-    });
-    
-    // Simple heatmap visualization
     let html = '<div style="display: grid; grid-template-columns: repeat(53, 1fr); gap: 2px;">';
     
     for (let i = 0; i < 365; i++) {
@@ -110,7 +97,7 @@ function renderHeatmap(entries) {
     }
     
     html += '</div>';
-    container.innerHTML = html;
+    document.getElementById('heatmap-container').innerHTML = html;
 }
 
 function renderRecentEntries(entries) {
@@ -154,7 +141,6 @@ function renderRecentEntries(entries) {
 function extractText(content) {
     if (typeof content === 'string') return content;
     if (!content) return '';
-    
     let text = '';
     function walk(node) {
         if (node.text) text += node.text;

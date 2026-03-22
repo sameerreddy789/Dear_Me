@@ -1,12 +1,10 @@
 import { firebaseConfig } from './config.js';
 
-// Initialize Firebase (you'll need to include Firebase SDK via CDN in HTML)
 let auth, db;
 let currentUser = null;
 let authStateListeners = [];
 
 export function initializeFirebase() {
-    // This assumes Firebase SDK is loaded via CDN
     if (typeof firebase === 'undefined') {
         console.error('Firebase SDK not loaded');
         return;
@@ -16,28 +14,17 @@ export function initializeFirebase() {
     auth = firebase.auth();
     db = firebase.firestore();
     
-    // Enable offline persistence
-    db.enablePersistence()
-        .catch((err) => {
-            console.warn('Persistence failed:', err);
-        });
+    db.enablePersistence().catch((err) => console.warn('Persistence failed:', err));
     
-    // Listen to auth state changes
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
-        
-        if (user) {
-            await createUserDocIfNeeded(user);
-        }
-        
-        // Notify all listeners
+        if (user) await createUserDocIfNeeded(user);
         authStateListeners.forEach(callback => callback(user));
     });
 }
 
 export function onAuthStateChange(callback) {
     authStateListeners.push(callback);
-    // Immediately call with current user
     callback(currentUser);
 }
 

@@ -1,5 +1,3 @@
-// Firebase Configuration
-// Replace these with your actual Firebase config values
 export const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_AUTH_DOMAIN",
@@ -9,7 +7,6 @@ export const firebaseConfig = {
     appId: "YOUR_APP_ID"
 };
 
-// Constants
 export const MOODS = ['happy', 'sad', 'productive', 'romantic', 'anxious', 'calm', 'neutral'];
 
 export const MOOD_EMOJIS = {
